@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Admissions Bot — Admin Dashboard</title>
+  <meta name="description" content="AI-powered WhatsApp admissions bot dashboard. Monitor leads, send outreach, and manage student data in real-time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🎓</div>
+      <div class="logo-text">
+        <span class="logo-title">AdmBot</span>
+        <span class="logo-sub">AI Admissions</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="outreach" id="nav-outreach">
+        <span class="nav-icon">📤</span>
+        <span>Send Outreach</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="leads" id="nav-leads">
+        <span class="nav-icon">👥</span>
+        <span>Student Leads</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="settings" id="nav-settings">
+        <span class="nav-icon">⚙️</span>
+        <span>Knowledge Base</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="bot-status-card" id="bot-status-card">
+        <div class="status-dot" id="status-dot"></div>
+        <div class="status-info">
+          <span class="status-label">Bot Status</span>
+          <span class="status-text" id="status-text">Connecting...</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 id="page-title">Dashboard</h1>
+        <span id="page-subtitle" class="page-subtitle">Real-time overview</span>
+      </div>
+      <div class="topbar-right">
+        <div class="time-display" id="time-display"></div>
+        <a href="/api/download/students" class="btn btn-primary" id="download-btn">
+          ⬇️ Download CSV
+        </a>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD TAB ===== -->
+    <section class="tab-content active" id="tab-dashboard">
+      <!-- QR Code Section (shown when not connected) -->
+      <div class="qr-section" id="qr-section" style="display:none">
+        <div class="qr-card">
+          <div class="qr-header">
+            <div class="pulse-ring"></div>
+            <h2>📱 Connect WhatsApp</h2>
+            <p>Scan this QR code with your phone to link your WhatsApp account to the bot</p>
+          </div>
+          <div class="qr-image-container">
+            <img id="qr-image" src="" alt="WhatsApp QR Code" />
+            <div class="qr-loading" id="qr-loading">
+              <div class="spinner"></div>
+              <p>Generating QR code...</p>
+            </div>
+          </div>
+          <div class="qr-steps">
+            <div class="qr-step">
+              <span class="step-num">1</span>
+              <span>Open WhatsApp on your phone</span>
+            </div>
+            <div class="qr-step">
+              <span class="step-num">2</span>
+              <span>Go to Settings → Linked Devices</span>
+            </div>
+            <div class="qr-step">
+              <span class="step-num">3</span>
+              <span>Tap "Link a Device" and scan above</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card stat-total">
+          <div class="stat-icon">👥</div>
+          <div class="stat-body">
+            <div class="stat-number" id="stat-total">0</div>
+            <div class="stat-label">Total Contacted</div>
+          </div>
+          <div class="stat-trend">↑</div>
+        </div>
+        <div class="stat-card stat-interested">
+          <div class="stat-icon">✅</div>
+          <div class="stat-body">
+            <div class="stat-number" id="stat-interested">0</div>
+            <div class="stat-label">Interested</div>
+          </div>
+        </div>
+        <div class="stat-card stat-completed">
+          <div class="stat-icon">🎉</div>
+          <div class="stat-body">
+            <div class="stat-number" id="stat-completed">0</div>
+            <div class="stat-label">Data Collected</div>
+          </div>
+        </div>
+        <div class="stat-card stat-not-interested">
+          <div class="stat-icon">❌</div>
+          <div class="stat-body">
+            <div class="stat-number" id="stat-not-interested">0</div>
+            <div class="stat-label">Not Interested</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="section-card">
+        <div class="section-header">
+          <h2>🔴 Live Activity Feed</h2>
+          <span class="live-badge">LIVE</span>
+        </div>
+        <div class="activity-feed" id="activity-feed">
+          <div class="activity-empty">
+            <span>⏳</span>
+            <p>Waiting for messages...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== OUTREACH TAB ===== -->
+    <section class="tab-content" id="tab-outreach">
+      <div class="outreach-grid">
+        <!-- Upload CSV -->
+        <div class="section-card">
+          <div class="section-header">
+            <h2>📁 Bulk Outreach (CSV Upload)</h2>
+          </div>
+          <p class="section-desc">Upload a CSV file with phone numbers to automatically send the first outreach message to all students.</p>
+          
+          <div class="upload-area" id="upload-area">
+            <input type="file" id="csv-upload" accept=".csv" style="display:none" />
+            <div class="upload-icon">📋</div>
+            <div class="upload-text">
+              <strong>Drag & drop your CSV here</strong>
+              <span>or click to browse</span>
+            </div>
+            <button class="btn btn-outline" onclick="document.getElementById('csv-upload').click()">Choose File</button>
+            <div class="file-selected" id="file-selected" style="display:none">
+              <span id="file-name">No file chosen</span>
+            </div>
+          </div>
+
+          <div class="delay-setting">
+            <label for="message-delay">⏱️ Delay between messages:</label>
+            <select id="message-delay" class="form-select">
+              <option value="3000">3 seconds (faster)</option>
+              <option value="5000" selected>5 seconds (recommended)</option>
+              <option value="10000">10 seconds (safer)</option>
+              <option value="15000">15 seconds (most safe)</option>
+            </select>
+          </div>
+
+          <div class="csv-format-hint">
+            <strong>📌 CSV Format:</strong> Your file must have a column named <code>phone_number</code>. Numbers must include country code (e.g., <code>923001234567</code> for Pakistan).
+          </div>
+
+          <button class="btn btn-primary btn-full" id="start-outreach-btn" onclick="startBulkOutreach()">
+            🚀 Start Outreach Campaign
+          </button>
+
+          <div class="outreach-progress" id="outreach-progress" style="display:none">
+            <div class="progress-bar-wrapper">
+              <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0 / 0 sent</span>
+          </div>
+        </div>
+
+        <!-- Single Number -->
+        <div class="section-card">
+          <div class="section-header">
+            <h2>📞 Send to Single Number</h2>
+          </div>
+          <p class="section-desc">Send the outreach message to one specific phone number.</p>
+          
+          <div class="form-group">
+            <label for="single-phone">Phone Number (with country code)</label>
+            <input type="text" id="single-phone" class="form-input" placeholder="923001234567" />
+            <small>Include country code without + or spaces (Pakistan: 92...)</small>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="single-send-btn" onclick="sendSingleOutreach()">
+            📤 Send Message
+          </button>
+
+          <div class="result-message" id="single-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LEADS TAB ===== -->
+    <section class="tab-content" id="tab-leads">
+      <div class="section-card" style="overflow-x:auto">
+        <div class="section-header">
+          <h2>👥 Student Leads</h2>
+          <div class="leads-actions">
+            <input type="text" id="leads-search" class="form-input search-input" placeholder="🔍 Search students..." oninput="filterLeads()" />
+            <a href="/api/download/students" class="btn btn-primary">⬇️ Download CSV</a>
+          </div>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="leads-table" id="leads-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Phone</th>
+                <th>Full Name</th>
+                <th>Father's Name</th>
+                <th>City</th>
+                <th>Program</th>
+                <th>FSc %</th>
+                <th>Matric %</th>
+                <th>CNIC</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody">
+              <tr><td colspan="12" class="empty-row">No leads yet. Start an outreach campaign!</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SETTINGS TAB ===== -->
+    <section class="tab-content" id="tab-settings">
+      <div class="section-card">
+        <div class="section-header">
+          <h2>📚 Admission Knowledge Base</h2>
+        </div>
+        <p class="section-desc">Edit the information the AI uses to answer student questions. Include programs, fees, deadlines, eligibility, and FAQs.</p>
+        
+        <textarea 
+          id="admission-info-editor" 
+          class="info-editor" 
+          placeholder="Enter admission information here..."
+          rows="25"
+        ></textarea>
+
+        <div class="settings-actions">
+          <button class="btn btn-primary" onclick="saveAdmissionInfo()">💾 Save Changes</button>
+          <div class="save-result" id="save-result"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
